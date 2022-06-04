@@ -8,18 +8,17 @@ const int thermo_sck_pin = 2;
 const int relay_pin = 5;
 const int button_pin = 6;
 
-const int stepDelay = 500;
-
-bool enabled = false;
-
-int currentTemp;
-int hotspotCompensation = 20;
-int temperatureOvershoot = 60;
+const int stepDelay = 200;
 
 const int numberOfSteps = 2;
 String stepNameList[numberOfSteps] = {"Preheat", "Reflow"};
 int tempCurve[numberOfSteps][2] = {{20, 80}, // {Time, Temp} Zeit in s
                                    {20, 150}};
+
+bool enabled = false;
+int currentTemp;
+int hotspotCompensation = 20;
+int temperatureOvershoot = 60;
 
 float totalTime = 0;
 
@@ -34,17 +33,8 @@ void setup()
   pinMode(button_pin, INPUT_PULLUP);
 
   Serial.begin(9600);
-  lcd.init();          // initialize the lcd
-  lcd.backlight();     // open the backlight
-  lcd.setCursor(0, 0); // move cursor to   (0, 0)
-
-  Serial.println("LCD");
-  lcd.setCursor(0, 1);
-  int currentTemp = thermocouple.readCelsius() + hotspotCompensation;
-  lcd.print((int)currentTemp);
-  lcd.setCursor(4, 1);
-  lcd.print((char)223); //° zeichen
-  lcd.print("C");
+  
+  displayStats(0, false);
 
   for (int i = 1; i < numberOfSteps; i++)
     tempCurve[i][0] += tempCurve[i - 1][0];
