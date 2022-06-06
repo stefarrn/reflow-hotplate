@@ -55,9 +55,9 @@ void loop()
 
   // preheat
   digitalWrite(relay_pin, HIGH);
-  for (int i = 0; i < preheatTime / stepDelay * 1000; i++)
+  for (int i = 0; i < preheatTime  * 1000 / stepDelay; i++)
   {
-    displayStats(0, "Preheat");
+    displayStats(0, "Heating");
     checkButton();
 
     if (!enabled)
