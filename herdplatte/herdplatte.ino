@@ -11,9 +11,10 @@ const int button_pin = 6;
 const int stepDelay = 200;
 
 const int numberOfSteps = 2;
-String stepNameList[numberOfSteps] = {"Preheat", "Reflow"};
+String stepNameList[numberOfSteps] = {"Startup", "Reflow"};
 int tempCurve[numberOfSteps][2] = {{40, 80}, // {Time, Temp} Zeit in s
                                    {20, 150}};
+int preheatTime = 12;
 
 bool enabled = false;
 int currentTemp;
@@ -33,8 +34,9 @@ void setup()
   pinMode(button_pin, INPUT_PULLUP);
 
   Serial.begin(9600);
-  
-  displayStats(0, false);
+  lcd.init();      // initialize the lcd
+  lcd.backlight(); // open the backlight
+  displayStats(0, "Boot");
 
   for (int i = 1; i < numberOfSteps; i++)
     tempCurve[i][0] += tempCurve[i - 1][0];
@@ -42,13 +44,28 @@ void setup()
 
 void loop()
 {
-reset:
   while (!enabled)
   {
     currentTemp = thermocouple.readCelsius() + hotspotCompensation;
+    digitalWrite(relay_pin, LOW);
 
     checkButton();
-    displayStats(0, false);
+    displayStats(0, "Idle");
+  }
+
+  // preheat
+  digitalWrite(relay_pin, HIGH);
+  for (int i = 0; i < preheatTime / stepDelay * 1000; i++)
+  {
+    displayStats(0, "Preheat");
+    checkButton();
+
+    if (!enabled)
+    {
+      break;
+    }
+
+    countDelay(stepDelay);
   }
 
   for (int i = 0; i < numberOfSteps; i++)
@@ -63,7 +80,7 @@ reset:
       countDelay(stepDelay);
 
       checkButton();
-      displayStats(i, true);
+      displayStats(i, "Heating");
 
       if (!enabled)
       {
@@ -79,7 +96,7 @@ reset:
       currentTemp = thermocouple.readCelsius() + hotspotCompensation;
 
       checkButton();
-      displayStats(i, false);
+      displayStats(i, "Waiting");
 
       if (!enabled)
       {
@@ -96,7 +113,7 @@ void countDelay(int t)
   totalTime += t / 1000;
 }
 
-void displayStats(int stepIndex, bool heating)
+void displayStats(int stepIndex, String heatingMessage)
 {
   lcd.clear();
 
@@ -113,21 +130,6 @@ void displayStats(int stepIndex, bool heating)
   case false:
   {
     buttonMessage = "start";
-    break;
-  }
-  }
-
-  String heatingMessage;
-  switch (heating)
-  {
-  case true:
-  {
-    heatingMessage = "Heating";
-    break;
-  }
-  case false:
-  {
-    heatingMessage = "Waiting";
     break;
   }
   }
