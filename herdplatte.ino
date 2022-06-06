@@ -12,13 +12,13 @@ const int stepDelay = 200;
 
 const int numberOfSteps = 2;
 String stepNameList[numberOfSteps] = {"Preheat", "Reflow"};
-int tempCurve[numberOfSteps][2] = {{20, 80}, // {Time, Temp} Zeit in s
+int tempCurve[numberOfSteps][2] = {{40, 80}, // {Time, Temp} Zeit in s
                                    {20, 150}};
 
 bool enabled = false;
 int currentTemp;
-int hotspotCompensation = 20;
-int temperatureOvershoot = 60;
+int hotspotCompensation = 10;
+int temperatureOvershoot = 80;
 
 float totalTime = 0;
 
