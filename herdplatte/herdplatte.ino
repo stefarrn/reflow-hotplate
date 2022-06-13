@@ -11,9 +11,9 @@ const int button_pin = 6;
 const int stepDelay = 200;
 
 const int numberOfSteps = 2;
-String stepNameList[numberOfSteps] = {"Startup", "Reflow"};
+String stepNameList[numberOfSteps] = {"Preheat", "Reflow"};
 int tempCurve[numberOfSteps][2] = {{40, 80}, // {Time, Temp} Zeit in s
-                                   {20, 150}};
+                                   {20, 160}};
 int preheatTime = 12;
 
 bool enabled = false;
